@@ -32,6 +32,8 @@ export default function Home() {
       switch (data.type) {
         case "log":
           console.log(data);
+          const byteLen = new TextEncoder().encode(JSON.stringify(data)).length;
+          console.log("Length: " + byteLen);
           setLog(data.log ?? []);
         case "users":
           // data.users is string[] or undefined → default to []
@@ -76,6 +78,7 @@ export default function Home() {
 
     // Afterwards, send chat messages
     const content = inputValue.trim();
+    if (content.length)
     if (!content) return;
     connection.current.send(
       JSON.stringify({ type: "chat", user: username, content })
@@ -104,6 +107,9 @@ export default function Home() {
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             placeholder={username ? "Send a message…" : "Set your username…"}
+            minLength={2}
+            maxLength={200}
+            required
             className="flex-1 border rounded px-3 py-2 focus:outline-none focus:ring"
           />
           <button

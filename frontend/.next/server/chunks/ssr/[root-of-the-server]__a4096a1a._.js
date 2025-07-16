@@ -38,6 +38,8 @@ function Home() {
             switch(data.type){
                 case "log":
                     console.log(data);
+                    const byteLen = new TextEncoder().encode(JSON.stringify(data)).length;
+                    console.log("Length: " + byteLen);
                     setLog(data.log ?? []);
                 case "users":
                     // data.users is string[] or undefined → default to []
@@ -82,7 +84,9 @@ function Home() {
         }
         // Afterwards, send chat messages
         const content = inputValue.trim();
-        if (!content) return;
+        if (content.length) {
+            if (!content) return;
+        }
         connection.current.send(JSON.stringify({
             type: "chat",
             user: username,
@@ -103,7 +107,7 @@ function Home() {
                                     children: m
                                 }, i, false, {
                                     fileName: "[project]/src/app/ws/page.tsx",
-                                    lineNumber: 92,
+                                    lineNumber: 95,
                                     columnNumber: 13
                                 }, this)),
                             messages.map((m, i)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -115,7 +119,7 @@ function Home() {
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/app/ws/page.tsx",
-                                            lineNumber: 96,
+                                            lineNumber: 99,
                                             columnNumber: 15
                                         }, this),
                                         " ",
@@ -123,13 +127,13 @@ function Home() {
                                     ]
                                 }, i, true, {
                                     fileName: "[project]/src/app/ws/page.tsx",
-                                    lineNumber: 95,
+                                    lineNumber: 98,
                                     columnNumber: 13
                                 }, this))
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/app/ws/page.tsx",
-                        lineNumber: 90,
+                        lineNumber: 93,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("form", {
@@ -141,10 +145,13 @@ function Home() {
                                 value: inputValue,
                                 onChange: (e)=>setInputValue(e.target.value),
                                 placeholder: username ? "Send a message…" : "Set your username…",
+                                minLength: 2,
+                                maxLength: 200,
+                                required: true,
                                 className: "flex-1 border rounded px-3 py-2 focus:outline-none focus:ring"
                             }, void 0, false, {
                                 fileName: "[project]/src/app/ws/page.tsx",
-                                lineNumber: 102,
+                                lineNumber: 105,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -153,19 +160,19 @@ function Home() {
                                 children: username ? "Send" : "Join"
                             }, void 0, false, {
                                 fileName: "[project]/src/app/ws/page.tsx",
-                                lineNumber: 109,
+                                lineNumber: 115,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/app/ws/page.tsx",
-                        lineNumber: 101,
+                        lineNumber: 104,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/src/app/ws/page.tsx",
-                lineNumber: 89,
+                lineNumber: 92,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -176,7 +183,7 @@ function Home() {
                         children: "Users"
                     }, void 0, false, {
                         fileName: "[project]/src/app/ws/page.tsx",
-                        lineNumber: 120,
+                        lineNumber: 126,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("ul", {
@@ -190,37 +197,37 @@ function Home() {
                                         className: value === "active" ? "text-green-500" : "text-red-500"
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/ws/page.tsx",
-                                        lineNumber: 124,
+                                        lineNumber: 130,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                         children: key
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/ws/page.tsx",
-                                        lineNumber: 132,
+                                        lineNumber: 138,
                                         columnNumber: 15
                                     }, this)
                                 ]
                             }, key, true, {
                                 fileName: "[project]/src/app/ws/page.tsx",
-                                lineNumber: 123,
+                                lineNumber: 129,
                                 columnNumber: 13
                             }, this))
                     }, void 0, false, {
                         fileName: "[project]/src/app/ws/page.tsx",
-                        lineNumber: 121,
+                        lineNumber: 127,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/src/app/ws/page.tsx",
-                lineNumber: 119,
+                lineNumber: 125,
                 columnNumber: 7
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/src/app/ws/page.tsx",
-        lineNumber: 87,
+        lineNumber: 90,
         columnNumber: 5
     }, this);
 }
