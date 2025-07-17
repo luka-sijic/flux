@@ -1,7 +1,7 @@
 "use client";
-
+import axios from "axios";
 import { useState, useEffect, useRef } from "react";
-import { Circle } from "lucide-react";
+import { Circle, Plus } from "lucide-react";
 
 type WSMessage = {
   type: "join" | "chat" | "users" | "log" | "ping";
@@ -15,7 +15,9 @@ export default function Home() {
   const connection = useRef<WebSocket | null>(null);
   const [username, setUsername] = useState<string>("");
   const [inputValue, setInputValue] = useState<string>("");
+  const [friendValue, setFriendValue] = useState<string>("");
   const [messages, setMessages] = useState<WSMessage[]>([]);
+  const [addFriend, setAddFriend] = useState<Boolean>(false);
   const [log, setLog] = useState<string[]>([]);
   const [users, setUsers] = useState<Record<string, string>>({});
 
@@ -56,7 +58,23 @@ export default function Home() {
     };
   }, []);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const addNewFriend = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const friend = friendValue;
+    const res = await axios.post('http://127.0.0.1:8082/friend', friend);
+    if (res.data.response) {
+      console.log("friend addded");
+    } else {
+      console.log("friend failed to add");
+    }
+  }
+
+  const handleFriend = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setAddFriend(!addFriend);
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (
       !connection.current ||
@@ -85,18 +103,35 @@ export default function Home() {
     setInputValue("");
   };
 
-  const hasUsers = Object.keys(users).length > 0;
-
   return (
     <div className="flex h-screen overflow-x-hidden">
       <div className="w-64 border border-white rounded p-4 bg-black text-white">
-        <h2 className="text-xl font-semibold mb-2">Users</h2>
+        <div className="flex justify-between">
+          <h2 className="text-xl font-semibold mb-2">Users</h2>
+          <form onSubmit={handleFriend}>
+            <button type="submit">
+              <Plus />
+            </button>
+          </form>
+        </div>
+        {addFriend ? (
+          <form onSubmit={addNewFriend}>
+          <input 
+            value={friendValue}
+            onChange={(e) => setFriendValue(e.target.value)}
+            placeholder="add friend..."
+            className="bg-gray-800 rounded p-1"
+          />
+          </form>
+        ) : (
+        ''
+        )}
         {/* 1) Users column */}
         <ul>
-        {Object.keys(users).length === 0 ? (
-          <p className="text-gray-500">No users connected</p>
-        ) : (
-          Object.entries(users).map(([key, value]) => (
+          {Object.keys(users).length === 0 ? (
+            <p className="text-gray-500 py-2">No users connected</p>
+          ) : (
+            Object.entries(users).map(([key, value]) => (
               <li key={key} className="flex items-center gap-1">
                 <Circle
                   size={12}
@@ -109,7 +144,7 @@ export default function Home() {
                 <span>{key}</span>
               </li>
             ))
-        )}
+          )}
         </ul>
       </div>
       {/* Chat Column */}
