@@ -1,45 +1,25 @@
 package main
 
 import (
-	"app/internal/pubsub2"
+	"app/internal/database"
 	"app/internal/server"
 	"context"
-	"fmt"
 	"log"
 	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
-
-	"cloud.google.com/go/pubsub"
-)
-
-var (
-	pubsubCli *pubsub.Client
-	chatTopic *pubsub.Topic
-	sub       *pubsub.Subscription
-	projectID = "artful-logic-152702"
-	topicID   = "message-pub"
 )
 
 func main() {
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
 
-	var err error
-	pubsubCli, err = pubsub.NewClient(ctx, projectID)
-	if err != nil {
-		log.Fatalf("pubsub.NewClient: %v", err)
-	}
-	chatTopic = pubsubCli.Topic(topicID)
+	database.Connect()
+	defer database.Close()
 
-	// 3) Ensure a subscription exists for *this* instance
-	hostname, _ := os.Hostname()
-	subID := fmt.Sprintf("chat-sub-%s", hostname)
-	sub = pubsub2.EnsureSubscription(ctx, pubsubCli, subID, chatTopic)
-
-	go server.SubscribeLoop(ctx, sub)
+	go server.SubscribeLoop(ctx)
 	go server.PingLoop(ctx)
 
 	http.HandleFunc("/ws", server.WSHandler)

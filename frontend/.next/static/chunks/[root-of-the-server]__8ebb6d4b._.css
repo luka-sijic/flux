@@ -169,6 +169,7 @@
     --color-green-500: #00c758;
     --color-blue-600: #155dfc;
     --color-blue-700: #1447e6;
+    --color-gray-500: #6a7282;
     --color-black: #000;
     --color-white: #fff;
     --spacing: .25rem;
@@ -192,6 +193,7 @@
       --color-green-500: color(display-p3 .308734 .774754 .374307);
       --color-blue-600: color(display-p3 .174493 .358974 .950247);
       --color-blue-700: color(display-p3 .1379 .274983 .867624);
+      --color-gray-500: color(display-p3 .421287 .446085 .504784);
     }
   }
 
@@ -201,6 +203,7 @@
       --color-green-500: lab(70.5521% -66.5147 45.8073);
       --color-blue-600: lab(44.0605% 29.0279 -86.0352);
       --color-blue-700: lab(36.9089% 35.0961 -85.6872);
+      --color-gray-500: lab(47.7841% -.393182 -10.0268);
     }
   }
 }
@@ -581,6 +584,18 @@
     height: 100vh;
   }
 
+  .max-h-0 {
+    max-height: calc(var(--spacing) * 0);
+  }
+
+  .max-h-96 {
+    max-height: calc(var(--spacing) * 96);
+  }
+
+  .min-h-0 {
+    min-height: calc(var(--spacing) * 0);
+  }
+
   .min-h-screen {
     min-height: 100vh;
   }
@@ -687,6 +702,10 @@
     margin-left: calc(calc(var(--spacing) * 2) * calc(1 - var(--tw-space-x-reverse)));
   }
 
+  .overflow-x-hidden {
+    overflow-x: hidden;
+  }
+
   .overflow-y-auto {
     overflow-y: auto;
   }
@@ -702,6 +721,11 @@
   .border {
     border-style: var(--tw-border-style);
     border-width: 1px;
+  }
+
+  .border-r {
+    border-right-style: var(--tw-border-style);
+    border-right-width: 1px;
   }
 
   .border-l {
@@ -726,6 +750,10 @@
 
   .border-transparent {
     border-color: rgba(0, 0, 0, 0);
+  }
+
+  .border-white {
+    border-color: var(--color-white);
   }
 
   .bg-black {
@@ -828,12 +856,24 @@
     letter-spacing: -.01em;
   }
 
+  .break-words {
+    overflow-wrap: break-word;
+  }
+
+  .break-all {
+    word-break: break-all;
+  }
+
   .whitespace-pre-wrap {
     white-space: pre-wrap;
   }
 
   .text-background {
     color: var(--background);
+  }
+
+  .text-gray-500 {
+    color: var(--color-gray-500);
   }
 
   .text-green-500 {

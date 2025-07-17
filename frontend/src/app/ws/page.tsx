@@ -78,19 +78,55 @@ export default function Home() {
 
     // Afterwards, send chat messages
     const content = inputValue.trim();
-    if (content.length)
-    if (!content) return;
+    if (content.length) if (!content) return;
     connection.current.send(
       JSON.stringify({ type: "chat", user: username, content })
     );
     setInputValue("");
   };
 
+  const hasUsers = Object.keys(users).length > 0;
+
   return (
-    <div className="flex h-screen">
+    <div className="flex h-screen overflow-x-hidden">
+      <div className="w-64 border border-white rounded p-4 bg-black text-white">
+        <h2 className="text-xl font-semibold mb-2">Users</h2>
+        {/* 1) Users column */}
+        <ul>
+        {Object.keys(users).length === 0 ? (
+          <p className="text-gray-500">No users connected</p>
+        ) : (
+          Object.entries(users).map(([key, value]) => (
+              <li key={key} className="flex items-center gap-1">
+                <Circle
+                  size={12}
+                  stroke="none"
+                  fill="currentColor"
+                  className={
+                    value === "active" ? "text-green-500" : "text-red-500"
+                  }
+                />
+                <span>{key}</span>
+              </li>
+            ))
+        )}
+        </ul>
+      </div>
       {/* Chat Column */}
-      <div className="flex flex-col flex-1 p-4">
-        <div className="flex-1 overflow-y-auto border rounded p-3 whitespace-pre-wrap bg-black text-white">
+      <div className="flex flex-col flex-1 p-4 min-h-0">
+        {/* Messages: now fills full height and only scrolls vertically */}
+        <div
+          className="
+        flex-1                /* take up all remaining vertical space */
+        overflow-y-auto       /* vertical scrolling as needed */
+        overflow-x-hidden     /* hide any horizontal overflow */
+        border rounded p-3
+        whitespace-pre-wrap
+        break-words           /* wrap long words */
+        break-all             /* break really long tokens if needed */
+        bg-black text-white
+      "
+        >
           {log.map((m, i) => (
             <p key={i}>{m}</p>
           ))}
@@ -119,26 +155,6 @@ export default function Home() {
             {username ? "Send" : "Join"}
           </button>
         </form>
-      </div>
-
-      {/* Users Column */}
-      <div className="w-64 border-l p-4 bg-black">
-        <h2 className="text-xl font-semibold mb-2">Users</h2>
-        <ul>
-          {Object.entries(users).map(([key, value]) => (
-            <li key={key} className="flex items-center gap-1">
-              <Circle
-                size={12}
-                stroke="none"
-                fill="currentColor"
-                className={
-                  value === "active" ? "text-green-500" : "text-red-500"
-                }
-              />
-              <span>{key}</span>
-            </li>
-          ))}
-        </ul>
       </div>
     </div>
   );
