@@ -53,6 +53,7 @@ func WSHandler(w http.ResponseWriter, r *http.Request) {
 		case "join":
 			client.Username = msg.Username
 			pubsub.Publish(msg)
+			broadcastUsers()
 
 		case "chat":
 			pubsub.Publish(msg)
@@ -163,7 +164,6 @@ broadcastUsers compiles the active user list and broadcasts it.
 */
 func broadcastUsers() {
 	users := make(map[string]string)
-	fmt.Println(users)
 	for c := range clients {
 		if c.Username != "" {
 			users[c.Username] = "active"

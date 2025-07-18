@@ -1,7 +1,10 @@
 "use client";
 import axios from "axios";
 import { useState, useEffect, useRef } from "react";
-import { Circle, Plus } from "lucide-react";
+import { Circle, Plus, Handshake } from "lucide-react";
+import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
+import { jwtDecode } from "jwt-decode";
 
 type WSMessage = {
   type: "join" | "chat" | "users" | "log" | "ping";
@@ -11,15 +14,38 @@ type WSMessage = {
   log?: string[];
 };
 
+type Friend = {
+  friend: string;
+};
+
 export default function Home() {
+  const router = useRouter();
   const connection = useRef<WebSocket | null>(null);
   const [username, setUsername] = useState<string>("");
+  const [friends, setFriends] = useState<Friend[]>([]);
   const [inputValue, setInputValue] = useState<string>("");
-  const [friendValue, setFriendValue] = useState<string>("");
+  const [friend, setFriendValue] = useState<string>("");
   const [messages, setMessages] = useState<WSMessage[]>([]);
   const [addFriend, setAddFriend] = useState<Boolean>(false);
   const [log, setLog] = useState<string[]>([]);
   const [users, setUsers] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    const fetchFriends = async () => {
+      try {
+        const response = await axios.get(
+          `http://127.0.0.1:8081/friend/${username}`
+        );
+        if (response.status === 200) {
+          setFriends(response.data);
+          console.log(response.data);
+        }
+      } catch (err) {
+        console.log("NO FRIENDS");
+      }
+    };
+    fetchFriends();
+  }, []);
 
   useEffect(() => {
     const socket = new WebSocket("ws://127.0.0.1:8080/ws");
@@ -60,19 +86,30 @@ export default function Home() {
 
   const addNewFriend = async (e: React.FormEvent) => {
     e.preventDefault();
-    const friend = friendValue;
-    const res = await axios.post('http://127.0.0.1:8082/friend', friend);
-    if (res.data.response) {
-      console.log("friend addded");
-    } else {
-      console.log("friend failed to add");
+    try {
+      const res = await axios.post("http://127.0.0.1:8081/friend", { friend });
+      toast.success("Friend request sent");
+      setFriendValue("");
+      if (res.status === 200) {
+        console.log("friend addded");
+      }
+    } catch (err) {
+      if (axios.isAxiosError(err) && err.response) {
+        if (err.response.status === 404) {
+          toast.error("User not found 🤔", {
+            className: "bg-red-400",
+          });
+          setFriendValue("");
+          console.log("No user exists");
+        }
+      }
     }
-  }
+  };
 
   const handleFriend = async (e: React.FormEvent) => {
     e.preventDefault();
     setAddFriend(!addFriend);
-  }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -81,16 +118,6 @@ export default function Home() {
       connection.current.readyState !== WebSocket.OPEN
     ) {
       console.error("WebSocket not open");
-      return;
-    }
-
-    // First submit uses inputValue as the username
-    if (!username) {
-      const name = inputValue.trim();
-      if (!name) return;
-      connection.current.send(JSON.stringify({ type: "join", user: name }));
-      setUsername(name);
-      setInputValue("");
       return;
     }
 
@@ -103,31 +130,38 @@ export default function Home() {
     setInputValue("");
   };
 
+  const friendRequests = async () => {
+    void router.push("/requests");
+  };
+
   return (
     <div className="flex h-screen overflow-x-hidden">
       <div className="w-64 border border-white rounded p-4 bg-black text-white">
         <div className="flex justify-between">
-          <h2 className="text-xl font-semibold mb-2">Users</h2>
+          <h2 className="text-xl font-semibold mb-2">Friends</h2>
           <form onSubmit={handleFriend}>
             <button type="submit">
-              <Plus />
+              <Plus className="cursor-pointer" />
+            </button>
+            <button onClick={friendRequests}>
+              <Handshake size={20} className="cursor-pointer" />
             </button>
           </form>
         </div>
         {addFriend ? (
           <form onSubmit={addNewFriend}>
-          <input 
-            value={friendValue}
-            onChange={(e) => setFriendValue(e.target.value)}
-            placeholder="add friend..."
-            className="bg-gray-800 rounded p-1"
-          />
+            <input
+              value={friend}
+              onChange={(e) => setFriendValue(e.target.value)}
+              placeholder="add friend..."
+              className="bg-gray-800 rounded p-1"
+            />
           </form>
         ) : (
-        ''
+          ""
         )}
         {/* 1) Users column */}
-        <ul>
+        {/*<ul>
           {Object.keys(users).length === 0 ? (
             <p className="text-gray-500 py-2">No users connected</p>
           ) : (
@@ -144,6 +178,13 @@ export default function Home() {
                 <span>{key}</span>
               </li>
             ))
+          )}
+        </ul>*/}
+        <ul>
+          {friends.length > 0 ? (
+            friends.map((f, i) => <li key={i}>{f.friend}</li>)
+          ) : (
+            <li>No friends found</li>
           )}
         </ul>
       </div>
@@ -177,7 +218,7 @@ export default function Home() {
             type="text"
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
-            placeholder={username ? "Send a message…" : "Set your username…"}
+            placeholder="Send message"
             minLength={2}
             maxLength={200}
             required
