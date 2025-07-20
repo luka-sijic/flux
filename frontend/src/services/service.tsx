@@ -24,6 +24,19 @@ export const fetchUsername = async (): Promise<string | null> => {
   }
 };
 
+export const getFriendReq = async (): Promise<Friend[]> => {
+  try {
+    const res = await api.get('/friend');
+    if (res.status === 200) {
+      return res.data;
+    } else {
+      return [];
+    }
+  } catch (err: any) {
+    return [];
+  }
+}
+
 export const addFriendReq = async (friend: string): Promise<Number> => {
   try {
     const res = await api.post(`/friend`, {friend});
@@ -79,3 +92,4 @@ export const fetchFriends = async (username: string): Promise<Friend[] | null> =
     return null;
   }
 };
+

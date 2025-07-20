@@ -1,5 +1,5 @@
 import {useState, useEffect} from "react";
-import {fetchFriends, fetchMessages, fetchUsername} from "../services/service";
+import {fetchFriends, fetchMessages, fetchUsername, getFriendReq} from "../services/service";
 
 export default function useUser() {
     const [username, setUsername] = useState<string | null>('');
@@ -46,4 +46,16 @@ export function getMessages(username: string | null, active: string | null) {
     }, [active]);
 
     return {log, setLog};
+}
+
+export function getFriendRequests() {
+    const [friends, setFriends] = useState<Friend[]>([]);
+
+    useEffect(() => {
+        getFriendReq()
+            .then((f) => setFriends(f))
+            .catch(() => setFriends([]));
+    }, []);
+
+    return {friends, setFriends};
 }
