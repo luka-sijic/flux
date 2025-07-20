@@ -1,0 +1,47 @@
+package handler
+
+import (
+	"log"
+	"net/http"
+
+	"github.com/luka-sijic/flux/internal/models"
+
+	"github.com/luka-sijic/flux/pkg/secret"
+
+	"github.com/labstack/echo/v4"
+)
+
+func (h *UserHandler) Register(c echo.Context) error {
+	user := new(models.UserDTO)
+	if err := c.Bind(user); err != nil {
+		log.Println(err)
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Failed to bind to user"})
+	}
+
+	result := h.svc.CreateUser(user)
+	if !result {
+		return c.JSON(http.StatusInternalServerError, "Failed to register user")
+	}
+
+	return c.JSON(http.StatusOK, "User successfully registered")
+}
+
+func (h *UserHandler) Login(c echo.Context) error {
+	user := new(models.UserDTO)
+	if err := c.Bind(&user); err != nil {
+		log.Println(err)
+	}
+
+	result := h.svc.LoginUser(user)
+	if !result {
+		return c.JSON(http.StatusInternalServerError, "Incorrect username/password")
+	}
+
+	access := secret.GenerateJWT(user.Username, 900)
+	refresh := secret.GenerateJWT(user.Username, 2592000)
+
+	setCookie(c, "access", access, 900)
+	setCookie(c, "refresh", refresh, 2592000)
+
+	return c.NoContent(http.StatusOK)
+}
