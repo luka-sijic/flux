@@ -1,4 +1,4 @@
-backend/credentials.json
+credentials.json
 frontend/node_modules
 backend/.env
 frontend/.next
