@@ -1,6 +1,6 @@
 credentials.json
+.env
 frontend/node_modules
-backend/.env
 frontend/.next
 .next
 frontend/out/

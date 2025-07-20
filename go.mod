@@ -1,4 +1,4 @@
-module app
+module github.com/luka-sijic/flux
 
 go 1.24.5
 

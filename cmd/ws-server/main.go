@@ -1,8 +1,6 @@
 package main
 
 import (
-	"app/internal/database"
-	"app/internal/server"
 	"context"
 	"log"
 	"net/http"
@@ -10,6 +8,9 @@ import (
 	"os/signal"
 	"syscall"
 	"time"
+
+	"github.com/luka-sijic/flux/internal/database"
+	"github.com/luka-sijic/flux/internal/server"
 )
 
 func main() {

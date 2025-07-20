@@ -1,13 +1,14 @@
 package pubsub
 
 import (
-	"app/internal/models"
 	"context"
 	"encoding/json"
 	"fmt"
 	"log"
 
-	"app/internal/database"
+	"github.com/luka-sijic/flux/internal/models"
+
+	"github.com/luka-sijic/flux/internal/database"
 
 	"github.com/redis/go-redis/v9"
 )

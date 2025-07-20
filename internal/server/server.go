@@ -1,9 +1,6 @@
 package server
 
 import (
-	"app/internal/database"
-	"app/internal/models"
-	"app/internal/pubsub"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -11,6 +8,10 @@ import (
 	"net/http"
 	"sync"
 	"time"
+
+	"github.com/luka-sijic/flux/internal/database"
+	"github.com/luka-sijic/flux/internal/models"
+	"github.com/luka-sijic/flux/internal/pubsub"
 
 	"github.com/gorilla/websocket"
 )
