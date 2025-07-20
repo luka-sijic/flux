@@ -2,20 +2,25 @@ package server
 
 import (
 	"log"
+	"os"
 
 	"github.com/luka-sijic/flux/internal/database"
 	"github.com/luka-sijic/flux/internal/routes"
 	"github.com/luka-sijic/flux/internal/service"
 	"github.com/luka-sijic/flux/pkg/auto"
 
+	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 )
 
 func Start() {
+	if err := godotenv.Load(".env"); err != nil {
+		log.Fatalln("Error loading .env file", err)
+	}
 	e := echo.New()
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
-		AllowOrigins: []string{"http://127.0.0.1:3000", "http://localhost:3000"},
+		AllowOrigins: []string{os.Getenv("CORS")},
 		AllowMethods: []string{echo.OPTIONS, echo.GET, echo.POST, echo.PUT, echo.DELETE},
 		AllowHeaders: []string{
 			echo.HeaderOrigin,
