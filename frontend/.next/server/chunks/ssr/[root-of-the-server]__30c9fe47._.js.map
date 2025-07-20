@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "sources": [],
-  "sections": [
-    {"offset": {"line": 6, "column": 0}, "map": {"version":3,"sources":[],"names":[],"mappings":"","debugId":null}},
-    {"offset": {"line": 18, "column": 0}, "map": {"version":3,"sources":["file:///Users/based/Documents/projects/websocket/frontend/src/app/ws/page.tsx"],"sourcesContent":["import { useEffect, useRef } from \"react\"\n\nexport const Home = () => {\n  const connection = useRef<WebSocket | null>(null)\n\n  useEffect(() => {\n    const socket = new WebSocket(\"ws://127.0.0.1:800\")\n\n    // Connection opened\n    socket.addEventListener(\"open\", () => {\n      socket.send(\"Connection established\")\n    })\n\n    // Listen for messages\n    socket.addEventListener(\"message\", (event) => {\n      console.log(\"Message from server \", event.data)\n    })\n\n    connection.current = socket\n\n    return () => {\n      if (connection.current) {\n        connection.current.close();\n      }\n    };\n  }, [])\n\n  return (\n    <div>HELLO</div>\n  )\n}"],"names":[],"mappings":";;;;AAAA;;;AAEO,MAAM,OAAO;IAClB,MAAM,aAAa,CAAA,GAAA,qMAAA,CAAA,SAAM,AAAD,EAAoB;IAE5C,CAAA,GAAA,qMAAA,CAAA,YAAS,AAAD,EAAE;QACR,MAAM,SAAS,IAAI,UAAU;QAE7B,oBAAoB;QACpB,OAAO,gBAAgB,CAAC,QAAQ;YAC9B,OAAO,IAAI,CAAC;QACd;QAEA,sBAAsB;QACtB,OAAO,gBAAgB,CAAC,WAAW,CAAC;YAClC,QAAQ,GAAG,CAAC,wBAAwB,MAAM,IAAI;QAChD;QAEA,WAAW,OAAO,GAAG;QAErB,OAAO;YACL,IAAI,WAAW,OAAO,EAAE;gBACtB,WAAW,OAAO,CAAC,KAAK;YAC1B;QACF;IACF,GAAG,EAAE;IAEL,qBACE,8OAAC;kBAAI;;;;;;AAET","debugId":null}}]
-}
