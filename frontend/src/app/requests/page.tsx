@@ -25,7 +25,7 @@ export default function Requests() {
     data.set("action", action.value);
 
     const response = await axios.post(
-      process.env.NEXT_PUBLIC_API + "friend/respond",
+      process.env.NEXT_PUBLIC_API + "/friend/respond",
       data
     );
     if (response.status === 200) {
