@@ -4,6 +4,8 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 
+axios.defaults.withCredentials = true
+
 export default function Login() {
   const router = useRouter();
   //const [username, setUsername] = useState<string>("");
@@ -17,6 +19,7 @@ export default function Login() {
       password,
     });
     if (res.status === 200) {
+      console.log(res);
       router.push("/ws");
     } else {
       console.log("Error: failed to login");

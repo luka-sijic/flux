@@ -148,6 +148,7 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$react$2d$hot
 ;
 ;
 ;
+__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$axios$2f$lib$2f$axios$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"].defaults.withCredentials = true;
 function Home() {
     const router = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useRouter"])();
     const connection = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useRef"])(null);
@@ -158,8 +159,43 @@ function Home() {
     const [messages, setMessages] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])([]);
     const [addFriend, setAddFriend] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(false);
     const [log, setLog] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])([]);
+    const [active, setActive] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])('');
     const [users, setUsers] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])({});
     (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useEffect"])(()=>{
+        const fetchUsername = async ()=>{
+            try {
+                const res = await __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$axios$2f$lib$2f$axios$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"].get('http://127.0.0.1:8081/me', {
+                    withCredentials: true
+                });
+                console.log(res);
+                if (res.status === 200) {
+                    setUsername(res.data);
+                } else {
+                    console.log("can't find username");
+                }
+            } catch (err) {
+                if (err.response?.status === 500) {
+                    try {
+                        const res = await __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$axios$2f$lib$2f$axios$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"].get('http://127.0.0.1:8081/refresh', {
+                            withCredentials: true
+                        });
+                        console.log("IDK: ", res);
+                        await __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$axios$2f$lib$2f$axios$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"].get('http://127.0.0.1:8081/me', {
+                            withCredentials: true
+                        });
+                    } catch (err) {
+                        console.log("ERROR2", err);
+                    }
+                }
+                router.replace("/ws");
+                console.log("TEST");
+                console.log(err);
+            }
+        };
+        fetchUsername();
+    }, []);
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useEffect"])(()=>{
+        if (!username) return;
         const fetchFriends = async ()=>{
             try {
                 const response = await __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$axios$2f$lib$2f$axios$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"].get(`http://127.0.0.1:8081/friend/${username}`);
@@ -172,7 +208,9 @@ function Home() {
             }
         };
         fetchFriends();
-    }, []);
+    }, [
+        username
+    ]);
     (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useEffect"])(()=>{
         const socket = new WebSocket("ws://127.0.0.1:8080/ws");
         socket.onopen = ()=>{
@@ -185,7 +223,7 @@ function Home() {
                     console.log(data);
                     const byteLen = new TextEncoder().encode(JSON.stringify(data)).length;
                     console.log("Length: " + byteLen);
-                    setLog(data.log ?? []);
+                //setLog(data.log ?? []);
                 case "users":
                     // data.users is string[] or undefined → default to []
                     setUsers(data.users ?? {});
@@ -257,6 +295,18 @@ function Home() {
     const friendRequests = async ()=>{
         void router.push("/requests");
     };
+    const getMessages = async (friend)=>{
+        try {
+            const response = await __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$axios$2f$lib$2f$axios$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"].get(`http://127.0.0.1:8081/friend/${username}/${friend}`);
+            console.log("MESSAGE GET RESPONSE: ", response);
+            if (response.status === 200) {
+                console.log(response);
+                setLog(response.data);
+            }
+        } catch (err) {
+            console.log("ERROR");
+        }
+    };
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
         className: "flex h-screen overflow-x-hidden",
         children: [
@@ -267,11 +317,11 @@ function Home() {
                         className: "flex justify-between",
                         children: [
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
-                                className: "text-xl font-semibold mb-2",
+                                className: "text-xl font-semibold mb-4",
                                 children: "Friends"
                             }, void 0, false, {
                                 fileName: "[project]/src/app/ws/page.tsx",
-                                lineNumber: 141,
+                                lineNumber: 190,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("form", {
@@ -283,12 +333,12 @@ function Home() {
                                             className: "cursor-pointer"
                                         }, void 0, false, {
                                             fileName: "[project]/src/app/ws/page.tsx",
-                                            lineNumber: 144,
+                                            lineNumber: 193,
                                             columnNumber: 15
                                         }, this)
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/ws/page.tsx",
-                                        lineNumber: 143,
+                                        lineNumber: 192,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -298,24 +348,24 @@ function Home() {
                                             className: "cursor-pointer"
                                         }, void 0, false, {
                                             fileName: "[project]/src/app/ws/page.tsx",
-                                            lineNumber: 147,
+                                            lineNumber: 196,
                                             columnNumber: 15
                                         }, this)
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/ws/page.tsx",
-                                        lineNumber: 146,
+                                        lineNumber: 195,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/app/ws/page.tsx",
-                                lineNumber: 142,
+                                lineNumber: 191,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/app/ws/page.tsx",
-                        lineNumber: 140,
+                        lineNumber: 189,
                         columnNumber: 9
                     }, this),
                     addFriend ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("form", {
@@ -327,37 +377,57 @@ function Home() {
                             className: "bg-gray-800 rounded p-1"
                         }, void 0, false, {
                             fileName: "[project]/src/app/ws/page.tsx",
-                            lineNumber: 153,
+                            lineNumber: 202,
                             columnNumber: 13
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/src/app/ws/page.tsx",
-                        lineNumber: 152,
+                        lineNumber: 201,
                         columnNumber: 11
                     }, this) : "",
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("ul", {
                         children: friends.length > 0 ? friends.map((f, i)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("li", {
-                                children: f.friend
+                                className: "flex justify-between w-22 text-gray-300 text-xl cursor-pointer",
+                                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                    type: "button",
+                                    onClick: ()=>getMessages(f.friend),
+                                    className: "flex items-center gap-2 cursor-pointer",
+                                    children: [
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("img", {
+                                            className: "w-7 h-7 rounded-2xl",
+                                            src: "https://avatars.akamai.steamstatic.com/7d88fb593b5030a1d1d2cfb8b05d282bc07fc389_full.jpg"
+                                        }, void 0, false, {
+                                            fileName: "[project]/src/app/ws/page.tsx",
+                                            lineNumber: 237,
+                                            columnNumber: 19
+                                        }, this),
+                                        f.friend
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "[project]/src/app/ws/page.tsx",
+                                    lineNumber: 236,
+                                    columnNumber: 19
+                                }, this)
                             }, i, false, {
                                 fileName: "[project]/src/app/ws/page.tsx",
-                                lineNumber: 185,
-                                columnNumber: 35
+                                lineNumber: 235,
+                                columnNumber: 15
                             }, this)) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("li", {
                             children: "No friends found"
                         }, void 0, false, {
                             fileName: "[project]/src/app/ws/page.tsx",
-                            lineNumber: 187,
+                            lineNumber: 242,
                             columnNumber: 13
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/src/app/ws/page.tsx",
-                        lineNumber: 183,
+                        lineNumber: 232,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/src/app/ws/page.tsx",
-                lineNumber: 139,
+                lineNumber: 188,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -367,10 +437,14 @@ function Home() {
                         className: " flex-1                /* take up all remaining vertical space */ overflow-y-auto       /* vertical scrolling as needed */ overflow-x-hidden     /* hide any horizontal overflow */ border rounded p-3 whitespace-pre-wrap break-words           /* wrap long words */ break-all             /* break really long tokens if needed */ bg-black text-white ",
                         children: [
                             log.map((m, i)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                                    children: m
-                                }, i, false, {
+                                    children: [
+                                        m.username,
+                                        ": ",
+                                        m.message
+                                    ]
+                                }, i, true, {
                                     fileName: "[project]/src/app/ws/page.tsx",
-                                    lineNumber: 207,
+                                    lineNumber: 262,
                                     columnNumber: 13
                                 }, this)),
                             messages.map((m, i)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -382,7 +456,7 @@ function Home() {
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/app/ws/page.tsx",
-                                            lineNumber: 211,
+                                            lineNumber: 266,
                                             columnNumber: 15
                                         }, this),
                                         " ",
@@ -390,13 +464,13 @@ function Home() {
                                     ]
                                 }, i, true, {
                                     fileName: "[project]/src/app/ws/page.tsx",
-                                    lineNumber: 210,
+                                    lineNumber: 265,
                                     columnNumber: 13
                                 }, this))
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/app/ws/page.tsx",
-                        lineNumber: 194,
+                        lineNumber: 249,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("form", {
@@ -414,7 +488,7 @@ function Home() {
                                 className: "flex-1 border rounded px-3 py-2 focus:outline-none focus:ring"
                             }, void 0, false, {
                                 fileName: "[project]/src/app/ws/page.tsx",
-                                lineNumber: 217,
+                                lineNumber: 272,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -423,25 +497,25 @@ function Home() {
                                 children: username ? "Send" : "Join"
                             }, void 0, false, {
                                 fileName: "[project]/src/app/ws/page.tsx",
-                                lineNumber: 227,
+                                lineNumber: 282,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/app/ws/page.tsx",
-                        lineNumber: 216,
+                        lineNumber: 271,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/src/app/ws/page.tsx",
-                lineNumber: 192,
+                lineNumber: 247,
                 columnNumber: 7
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/src/app/ws/page.tsx",
-        lineNumber: 138,
+        lineNumber: 187,
         columnNumber: 5
     }, this);
 }

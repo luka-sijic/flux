@@ -3,40 +3,49 @@
 import { useEffect, useState, FormEvent } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
-import { Check, X } from "lucide-react";
+import { Check, X, Home } from "lucide-react";
 import toast from 'react-hot-toast';
 
 type Friends = {
   friend: string;
 };
 
+axios.defaults.withCredentials = true
+
 export default function Requests() {
   const router = useRouter();
+  const [username, setUsername] = useState<string>('');
   const [friends, setFriends] = useState<Friends[]>([]);
   const [token, setToken] = useState<string>("");
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!token) return router.replace("/auth");
-    setToken(token);
+    const fetchUsername = async () => {
+      try {
+        const res = await axios.get('http://127.0.0.1:8081/me', {withCredentials: true});
+        console.log(res);
+        if (res.status === 200) {
+          setUsername(res.data);
+        } else {
+          console.log("can't find username");
+          router.replace('/auth');
+        }
+      } catch (err) {
+        console.log(err);
+      }
+    }
+    fetchUsername();
   }, []);
 
   useEffect(() => {
-    if (!token) return;
     const fetchFriendReq = async () => {
-      const response = await axios.get("http://127.0.0.1:8081/friend", {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await axios.get("http://127.0.0.1:8081/friend");
       console.log(response);
       if (response.status === 200) {
         setFriends(response.data);
       }
     };
     fetchFriendReq();
-  }, [token]);
+  }, []);
 
   const friendResponse = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -63,9 +72,19 @@ export default function Requests() {
     }
   };
 
+  const handleBack = () => {
+    void router.push('/ws');
+  }
+
   return (
     <div>
-      <h2>Friend Requests</h2>
+      <div className="flex w-60 m-4 gap-2">
+        <Home 
+          className="cursor-pointer"
+          onClick={handleBack}
+        />
+        <h2>Friend Requests</h2>
+      </div>
       <div className="bg-gray-700 p-2 m-2 w-64 rounded">
         {" "}
         {/* smaller box */}
@@ -76,21 +95,20 @@ export default function Requests() {
             <p>No pending friend requests</p>
           ) : (
             friends.map((f, i) => (
-              <li key={i} className="flex items-center">
-                <span className="truncate">{f.friend}</span>{" "}
-                {/* name on the left */}
-                {/* icons on the far right, with space between them */}
-                <div className="ml-auto flex gap-3">
-                  <form onSubmit={friendResponse}>
+              <li key={i} className="flex items-center m-2">
+                <span className="truncate">{f.friend}</span>
+                  <form 
+                    onSubmit={friendResponse} 
+                    className="ml-auto flex gap-3"
+                  >
                     <input type="hidden" name="friendId" value={f.friend} />
                     <button value="accepted">
-                      <Check className="cursor-pointer" />
+                      <Check className="bg-green-400 cursor-pointer" />
                     </button>
                     <button value="rejected">
-                      <X className="cursor-pointer" />
+                      <X className="bg-red-400 cursor-pointer" />
                     </button>
                   </form>
-                </div>
               </li>
             ))
           )}

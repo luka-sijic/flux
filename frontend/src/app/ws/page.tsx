@@ -1,14 +1,16 @@
 "use client";
 import axios from "axios";
 import { useState, useEffect, useRef } from "react";
-import { Circle, Plus, Handshake } from "lucide-react";
+import { Heart, Plus, Handshake } from "lucide-react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
-import { jwtDecode } from "jwt-decode";
+import refreshToken from "@/lib/auth";
+axios.defaults.withCredentials = true;
 
 type WSMessage = {
   type: "join" | "chat" | "users" | "log" | "ping";
   user?: string;
+  user1?: string;
   content?: string;
   users?: Record<string, string>;
   log?: string[];
@@ -16,6 +18,11 @@ type WSMessage = {
 
 type Friend = {
   friend: string;
+};
+
+type Message = {
+  username: string;
+  message: string;
 };
 
 export default function Home() {
@@ -27,25 +34,55 @@ export default function Home() {
   const [friend, setFriendValue] = useState<string>("");
   const [messages, setMessages] = useState<WSMessage[]>([]);
   const [addFriend, setAddFriend] = useState<Boolean>(false);
-  const [log, setLog] = useState<string[]>([]);
+  const [log, setLog] = useState<Message[]>([]);
+  const [active, setActive] = useState<string>("");
+  const [liked, setLiked] = useState<Set<number>>(new Set());
   const [users, setUsers] = useState<Record<string, string>>({});
 
   useEffect(() => {
+    const fetchUsername = async () => {
+      try {
+        const res = await axios.get("http://127.0.0.1:8081/me");
+        console.log(res);
+        if (res.status === 200) {
+          setUsername(res.data);
+        } else {
+          console.log("can't find username");
+        }
+      } catch (err: any) {
+        if (err.response?.status === 500) {
+          const ok = refreshToken();
+          if (ok) {
+            router.replace("/ws");
+          }
+        }
+        console.log(err);
+      }
+    };
+    fetchUsername();
+  }, []);
+
+  useEffect(() => {
+    if (!username) return;
     const fetchFriends = async () => {
       try {
         const response = await axios.get(
           `http://127.0.0.1:8081/friend/${username}`
         );
         if (response.status === 200) {
+          console.log("RESPONSE: ", response.data);
           setFriends(response.data);
-          console.log(response.data);
+          console.log(response.data.length);
+          if (response.data.length > 0) {
+            setActive(response.data[0].friend);
+          }
         }
       } catch (err) {
         console.log("NO FRIENDS");
       }
     };
     fetchFriends();
-  }, []);
+  }, [username]);
 
   useEffect(() => {
     const socket = new WebSocket("ws://127.0.0.1:8080/ws");
@@ -62,7 +99,7 @@ export default function Home() {
           console.log(data);
           const byteLen = new TextEncoder().encode(JSON.stringify(data)).length;
           console.log("Length: " + byteLen);
-          setLog(data.log ?? []);
+        //setLog(data.log ?? []);
         case "users":
           // data.users is string[] or undefined → default to []
           setUsers(data.users ?? {});
@@ -125,7 +162,7 @@ export default function Home() {
     const content = inputValue.trim();
     if (content.length) if (!content) return;
     connection.current.send(
-      JSON.stringify({ type: "chat", user: username, content })
+      JSON.stringify({ type: "chat", user: username, user2: active, content })
     );
     setInputValue("");
   };
@@ -134,11 +171,60 @@ export default function Home() {
     void router.push("/requests");
   };
 
+  /*const getMessages = async (friend: string) => {
+    try {
+      console.log("Active username: ", friend);
+      setActive(friend);
+      const response = await axios.get(
+        `http://127.0.0.1:8081/friend/${username}/${friend}`
+      );
+      console.log("MESSAGE GET RESPONSE: ", response);
+      if (response.status === 200) {
+        setMessages([]);
+        setLog(response.data);
+      }
+    } catch (err) {
+      console.log("ERROR");
+    }
+  };*/
+
+  useEffect(() => {
+    if (!active) return;
+    const fetchMessages = async () => {
+      try {
+        console.log("Active username: ", active);
+        const response = await axios.get(
+          `http://127.0.0.1:8081/friend/${username}/${active}`
+        );
+        console.log("MESSAGE GET RESPONSE: ", response);
+        if (response.status === 200) {
+          setMessages([]);
+          setLog(response.data);
+        }
+      } catch (err) {
+        console.log("ERROR");
+      }
+    };
+    fetchMessages();
+  }, [active]);
+
+  const likeMessage = async (id: number) => {
+    setLiked((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
+  };
+
   return (
     <div className="flex h-screen overflow-x-hidden">
       <div className="w-64 border border-white rounded p-4 bg-black text-white">
         <div className="flex justify-between">
-          <h2 className="text-xl font-semibold mb-2">Friends</h2>
+          <h2 className="text-xl font-semibold mb-4">Friends</h2>
           <form onSubmit={handleFriend}>
             <button type="submit">
               <Plus className="cursor-pointer" />
@@ -182,7 +268,24 @@ export default function Home() {
         </ul>*/}
         <ul>
           {friends.length > 0 ? (
-            friends.map((f, i) => <li key={i}>{f.friend}</li>)
+            friends.map((f, i) => (
+              <li
+                key={i}
+                className="flex justify-between w-22 text-gray-300 text-xl cursor-pointer"
+              >
+                <button
+                  type="button"
+                  onClick={() => setActive(f.friend)}
+                  className="flex items-center gap-2 cursor-pointer"
+                >
+                  <img
+                    className="w-7 h-7 rounded-2xl"
+                    src="https://avatars.akamai.steamstatic.com/7d88fb593b5030a1d1d2cfb8b05d282bc07fc389_full.jpg"
+                  />
+                  {f.friend}
+                </button>
+              </li>
+            ))
           ) : (
             <li>No friends found</li>
           )}
@@ -203,14 +306,24 @@ export default function Home() {
         bg-black text-white
       "
         >
-          {log.map((m, i) => (
-            <p key={i}>{m}</p>
-          ))}
-          {messages.map((m, i) => (
-            <p key={i}>
-              <strong>{m.user}:</strong> {m.content}
-            </p>
-          ))}
+          <p>Load chat for: {active}</p>
+          <ul>
+            {log.map((m, i) => (
+              <li key={i} className="flex gap-1">
+                <Heart
+                  onClick={() => likeMessage(i)}
+                  className="w-3 h3"
+                  fill={liked.has(i) ? "pink" : "none"}
+                />
+                {m.username}: {m.message}
+              </li>
+            ))}
+            {messages.map((m, i) => (
+              <li key={i}>
+                <strong>{m.user}:</strong> {m.content}
+              </li>
+            ))}
+          </ul>
         </div>
 
         <form onSubmit={handleSubmit} className="flex mt-4 space-x-2">
