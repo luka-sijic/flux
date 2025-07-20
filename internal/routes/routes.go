@@ -10,8 +10,8 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-func Routes(e *echo.Echo, svc *service.Infra) {
-	userHandler := handler.NewHandler(svc)
+func UserRoutes(e *echo.Echo, svc *service.Infra) {
+	userHandler := handler.NewUserHandler(svc)
 
 	e.GET("/", func(c echo.Context) error {
 		return c.JSON(http.StatusOK, "OK")
@@ -22,10 +22,14 @@ func Routes(e *echo.Echo, svc *service.Infra) {
 	e.GET("/me", handler.Me)
 	e.GET("/cookie", handler.Cookie)
 	e.GET("/refresh", handler.Refresh)
+}
 
-	e.POST("/friend", userHandler.AddFriend, secret.Auth)
-	e.GET("/friend", userHandler.GetRequest, secret.Auth)
-	e.POST("/friend/respond", userHandler.Respond, secret.Auth)
-	e.GET("/friend/:id", userHandler.GetFriends, secret.Auth)
-	e.GET("/friend/:user1/:user2", userHandler.GetLog)
+func FriendRoutes(e *echo.Echo, svc *service.Infra) {
+	friendHandler := handler.NewFriendHandler(svc)
+
+	e.POST("/friend", friendHandler.AddFriend, secret.Auth)
+	e.GET("/friend", friendHandler.GetRequest, secret.Auth)
+	e.POST("/friend/respond", friendHandler.Respond, secret.Auth)
+	e.GET("/friend/:id", friendHandler.GetFriends, secret.Auth)
+	e.GET("/friend/:user1/:user2", friendHandler.GetLog)
 }

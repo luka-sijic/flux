@@ -43,7 +43,9 @@ func Start() {
 	}
 
 	userSvc := service.NewService(app)
-	routes.Routes(e, userSvc)
+	friendSvc := service.NewService(app)
+	routes.UserRoutes(e, userSvc)
+	routes.FriendRoutes(e, friendSvc)
 
 	e.Logger.Fatal(e.Start(":8081"))
 }

@@ -10,7 +10,7 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-func (h *UserHandler) AddFriend(c echo.Context) error {
+func (h *FriendHandler) AddFriend(c echo.Context) error {
 	username := c.Get("username").(string)
 	user := new(models.FriendDTO)
 	if err := c.Bind(&user); err != nil {
@@ -28,7 +28,7 @@ func (h *UserHandler) AddFriend(c echo.Context) error {
 	return c.JSON(http.StatusOK, "Friend request sent")
 }
 
-func (h *UserHandler) GetFriends(c echo.Context) error {
+func (h *FriendHandler) GetFriends(c echo.Context) error {
 	username := c.Param("id")
 
 	result := h.svc.GetFriends(username)
@@ -38,7 +38,7 @@ func (h *UserHandler) GetFriends(c echo.Context) error {
 	return c.JSON(http.StatusOK, result)
 }
 
-func (h *UserHandler) GetRequest(c echo.Context) error {
+func (h *FriendHandler) GetRequest(c echo.Context) error {
 	username := c.Get("username").(string)
 
 	result := h.svc.GetRequests(username)
@@ -49,7 +49,7 @@ func (h *UserHandler) GetRequest(c echo.Context) error {
 	return c.JSON(http.StatusOK, result)
 }
 
-func (h *UserHandler) Respond(c echo.Context) error {
+func (h *FriendHandler) Respond(c echo.Context) error {
 	username := c.Get("username").(string)
 	action := new(models.FriendActionDTO)
 	if err := c.Bind(&action); err != nil {
@@ -64,7 +64,7 @@ func (h *UserHandler) Respond(c echo.Context) error {
 	return c.JSON(http.StatusOK, "Friend request updated")
 }
 
-func (h *UserHandler) GetLog(c echo.Context) error {
+func (h *FriendHandler) GetLog(c echo.Context) error {
 	user1 := c.Param("user1")
 	user2 := c.Param("user2")
 

@@ -9,25 +9,18 @@ import (
 	"github.com/redis/go-redis/v9"
 )
 
-type Service interface {
+type UserService interface {
 	CreateUser(user *models.UserDTO) bool
 	LoginUser(user *models.UserDTO) bool
+}
 
+type FriendService interface {
 	AddFriend(username string, user *models.FriendDTO) bool
 	GetFriends(username string) []models.FriendDTO
 	GetRequests(username string) []models.FriendDTO
 	FriendResponse(username string, action *models.FriendActionDTO) bool
 	GetLog(username1, username2 string) []models.Messages
 }
-
-/*
-type FrienService interface {
-	AddFriend(username string, user *models.FriendDTO) bool
-	GetFriends(username string) []models.FriendDTO
-	GetRequests(username string) []models.FriendDTO
-	FriendResponse(username string, action *models.FriendActionDTO) bool
-}
-*/
 
 type Infra struct {
 	Pools []*pgxpool.Pool
