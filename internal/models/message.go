@@ -1,10 +1,9 @@
 package models
 
-import (
-	"time"
-
-	"github.com/gorilla/websocket"
-)
+type Messages struct {
+	Username string `json:"username"`
+	Message  string `json:"message"`
+}
 
 type Message struct {
 	Type     string            `json:"type"`
@@ -13,10 +12,4 @@ type Message struct {
 	Content  string            `json:"content,omitempty"`
 	Users    map[string]string `json:"users,omitempty"`
 	Log      []string          `json:"log,omitempty"`
-}
-
-type Client struct {
-	Conn     *websocket.Conn
-	Username string
-	LastPong time.Time
 }

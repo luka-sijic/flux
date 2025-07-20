@@ -22,8 +22,3 @@ type Claims struct {
 	Status   int    `json:"status"`
 	jwt.RegisteredClaims
 }
-
-type Messages struct {
-	Username string `json:"username"`
-	Message  string `json:"message"`
-}
