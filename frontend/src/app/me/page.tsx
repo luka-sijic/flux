@@ -1,28 +1,16 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import axios from "axios";
-
-//axios.defaults.withCredentials = true
+import useUser  from '../../hooks/useHook';
 
 export default function Me() {
-    const [me, setMe] = useState<string>('');
+    const {username, loading} = useUser();
 
-    useEffect(() => {
-        const getMe = async () => {
-            const respon2 = await axios.get("http://127.0.0.1:8081/cookie")
-            console.log(respon2)
-            const response = await axios.get("http://127.0.0.1:8081/me", {withCredentials: true})
-            console.log(response);
-            if (response.status === 200) {
-                setMe(response.data);
-            } else {
-                console.log("Cookie problem :D");
-            }
-        }
-        getMe();
-    }, []);
+    if (loading) return <p>Loading</p>
+    if (!username) return <p>Not logged in</p>
+
     return (
-        <div>{me}</div>
+        <div>
+            Welcome {username}
+        </div>
     )
 }

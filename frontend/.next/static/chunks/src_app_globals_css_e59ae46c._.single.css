@@ -821,6 +821,10 @@
     border-style: solid;
   }
 
+  .border-black {
+    border-color: var(--color-black);
+  }
+
   .border-black\/\[\.08\] {
     border-color: rgba(0, 0, 0, .08);
   }
