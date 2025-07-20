@@ -63,8 +63,6 @@ export default function Home() {
     };
   }, []);*/
 
-  
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (
@@ -86,11 +84,8 @@ export default function Home() {
   return (
     <div className="flex h-screen overflow-x-hidden">
       <div className="w-64 border border-gray rounded p-4 bg-black text-white">
-       <AddFriendForm />
-        <FriendsList
-          friends={friends}
-          setActive={setActive} 
-        />
+        <AddFriendForm />
+        <FriendsList friends={friends} setActive={setActive} />
       </div>
       {/* Chat Column */}
       <div className="flex flex-col flex-1 p-4 min-h-0">
@@ -108,9 +103,7 @@ export default function Home() {
       "
         >
           <p>Load chat for: {active}</p>
-          <MessageList
-            log={log}
-           />
+          <MessageList log={log} />
         </div>
 
         <form onSubmit={handleSubmit} className="flex mt-4 space-x-2">
