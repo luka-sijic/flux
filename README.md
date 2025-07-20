@@ -1,4 +1,4 @@
-# message
+# Flux Messaging App
 ## Apps
 Go Websocket server\
 Go HTTP server\
