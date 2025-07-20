@@ -9,12 +9,10 @@ import (
 	"github.com/redis/go-redis/v9"
 )
 
-type UserService interface {
+type Service interface {
 	CreateUser(user *models.UserDTO) bool
 	LoginUser(user *models.UserDTO) bool
-}
 
-type FriendService interface {
 	AddFriend(username string, user *models.FriendDTO) bool
 	GetFriends(username string) []models.FriendDTO
 	GetRequests(username string) []models.FriendDTO
