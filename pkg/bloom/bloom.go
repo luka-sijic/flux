@@ -17,7 +17,7 @@ func (c *CBF) Insert(data string) {
 	h2 := murmurHash(data, 0x12345678)
 
 	for i := 0; i < int(c.hashCount); i++ {
-		index := c.hash(data, uint32(i), h1, h2)
+		index := c.hash(uint32(i), h1, h2)
 		c.count[index]++
 	}
 }
@@ -27,7 +27,7 @@ func (c *CBF) PossiblyContains(data string) bool {
 	h2 := murmurHash(data, 0x12345678)
 
 	for i := 0; i < int(c.hashCount); i++ {
-		index := c.hash(data, uint32(i), h1, h2)
+		index := c.hash(uint32(i), h1, h2)
 		if c.count[index] == 0 {
 			return false
 		}
@@ -35,7 +35,7 @@ func (c *CBF) PossiblyContains(data string) bool {
 	return true
 }
 
-func (c *CBF) hash(key string, i, h1, h2 uint32) uint32 {
+func (c *CBF) hash(i, h1, h2 uint32) uint32 {
 	return (h1 + i*h2) % c.size
 }
 
