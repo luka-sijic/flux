@@ -9,25 +9,31 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/luka-sijic/flux/internal/database"
-	"github.com/luka-sijic/flux/internal/server"
+	"github.com/gorilla/mux"
+	"github.com/luka-sijic/flux/internal/hub"
+	"github.com/luka-sijic/flux/internal/transport"
 )
 
 func main() {
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
 
-	database.Connect()
-	defer database.Close()
+	h := hub.New()
+	go h.Run()
 
-	go server.SubscribeLoop(ctx)
-	go server.PingLoop(ctx)
+	//go server.SubscribeLoop(ctx)
+	//go server.PingLoop(ctx)
 
-	http.HandleFunc("/ws", server.WSHandler)
-	srv := &http.Server{Addr: ":8080"}
+	r := mux.NewRouter()
+	r.Handle("/ws", transport.New(h)).Methods("GET")
+
+	srv := &http.Server{
+		Addr:    ":8085",
+		Handler: r,
+	}
 
 	go func() {
-		log.Println("WebSocket server listening on :8080")
+		log.Println("WebSocket server listening on :8085")
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			log.Fatalf("ListenAndServe: %v", err)
 		}

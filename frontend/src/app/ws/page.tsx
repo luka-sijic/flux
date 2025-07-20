@@ -1,6 +1,5 @@
 "use client";
-import axios from "axios";
-import { useState, useEffect, useRef } from "react";
+import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import useUser, { getFriends, getMessages } from "@/hooks/useHook";
 import AddFriendForm from "@/components/addFriend";
@@ -24,44 +23,6 @@ export default function Home() {
   if (!username) return <p>Not logged in</p>;
   if (!friends) return <p>No friends</p>;
   if (!log) return <p>No messages</p>;
-
-  /*
-  useEffect(() => {
-    const socket = new WebSocket("ws://127.0.0.1:8080/ws");
-
-    socket.onopen = () => {
-      console.log("Connection opened");
-    };
-
-    socket.onmessage = (event) => {
-      const data = JSON.parse(event.data) as WSMessage;
-
-      switch (data.type) {
-        case "log":
-          console.log(data);
-          const byteLen = new TextEncoder().encode(JSON.stringify(data)).length;
-          console.log("Length: " + byteLen);
-        //setLog(data.log ?? []);
-        case "users":
-          // data.users is string[] or undefined → default to []
-          setUsers(data.users ?? {});
-          break;
-
-        case "chat":
-          // append the new WSMessage to our array
-          setMessages((prev) => [...prev, data]);
-          break;
-        case "ping":
-          socket.send(JSON.stringify({ type: "pong" }));
-          break;
-      }
-    };
-
-    connection.current = socket;
-    return () => {
-      socket.close();
-    };
-  }, []);*/
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
