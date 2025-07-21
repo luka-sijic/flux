@@ -13,7 +13,7 @@ COPY . .
 
 # Build just the ws-server command
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 \
-    go build -o /out/ws-server ./cmd/app/ws-server
+    go build -o /out/ws-server ./cmd/ws-server
 
 ########################
 # 2. Minimal runtime image

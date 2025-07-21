@@ -13,7 +13,7 @@ COPY . .
 
 # Build just the http-server command
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 \
-    go build -o /out/http-server ./cmd/app/http-server
+    go build -o /out/http-server ./cmd/http-server
 
 ########################
 # 2. Minimal runtime image
@@ -22,5 +22,5 @@ FROM gcr.io/distroless/static:nonroot
 WORKDIR /app
 COPY --from=builder /out/http-server /app/
 USER nonroot:nonroot
-EXPOSE 8081
+EXPOSE 8015
 ENTRYPOINT ["/app/http-server"]

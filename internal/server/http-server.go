@@ -52,5 +52,5 @@ func Start() {
 	routes.UserRoutes(e, userSvc)
 	routes.FriendRoutes(e, friendSvc)
 
-	e.Logger.Fatal(e.Start(":8081"))
+	e.Logger.Fatal(e.Start(":8015"))
 }

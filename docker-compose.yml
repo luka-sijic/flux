@@ -2,19 +2,23 @@ version: "3.9"
 
 services:
   http:
+    env_file: .env
+    volumes:
+      - ./.env:/app/.env:ro
     build:
       context: .
       dockerfile: build/http.Dockerfile
-    env_file: .env          # injects all key=value pairs
     ports:
-      - "8081:8081"
+      - "8015:8015"
     restart: unless-stopped
 
   ws:
+    env_file: .env
+    volumes:
+      - ./.env:/app/.env:ro
     build:
       context: .
       dockerfile: build/ws.Dockerfile
-    env_file: .env
     ports:
       - "8085:8085"
     restart: unless-stopped
@@ -23,7 +27,7 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-    env_file: .env
+    command: ["pnpm", "start"]
     ports:
       - "3010:3010"
     depends_on:
