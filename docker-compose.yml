@@ -24,11 +24,11 @@ services:
     restart: unless-stopped
 
   frontend:
-    env_file: /home/based/keys/.env.local
-    volumes:
-      - /home/based/keys/.env.local:/app/.env.local:ro
     build:
       context: ./frontend
+      args:
+        NEXT_PUBLIC_API: ${NEXT_PUBLIC_API}
+        NEXT_PUBLIC_WS:  ${NEXT_PUBLIC_WS}
       dockerfile: Dockerfile
     command: ["pnpm", "start"]
     ports:

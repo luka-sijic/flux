@@ -31,6 +31,10 @@ COPY --from=deps /app/package.json ./package.json
 
 # Bring in the actual source (thanks to .dockerignore, no local node_modules!)
 COPY . .
+ARG NEXT_PUBLIC_API
+ARG NEXT_PUBLIC_WS
+ENV NEXT_PUBLIC_API=$NEXT_PUBLIC_API
+ENV NEXT_PUBLIC_WS=$NEXT_PUBLIC_WS
 
 RUN pnpm run build      # generates .next/, etc.
 
