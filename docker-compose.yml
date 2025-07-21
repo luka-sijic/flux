@@ -24,6 +24,9 @@ services:
     restart: unless-stopped
 
   frontend:
+    env_file: /home/based/keys/.env.local
+    volumes:
+      - /home/based/keys/.env.local:/app/.env:ro
     build:
       context: ./frontend
       dockerfile: Dockerfile
