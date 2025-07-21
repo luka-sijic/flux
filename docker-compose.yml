@@ -2,9 +2,9 @@ version: "3.9"
 
 services:
   http:
-    env_file: .env
+    env_file: /home/based/keys/.env
     volumes:
-      - ./.env:/app/.env:ro
+      - /home/based/keys/.env:/app/.env:ro
     build:
       context: .
       dockerfile: build/http.Dockerfile
@@ -13,9 +13,9 @@ services:
     restart: unless-stopped
 
   ws:
-    env_file: .env
+    env_file: /home/based/keys/.env
     volumes:
-      - ./.env:/app/.env:ro
+      - /home/based/keys/.env:/app/.env:ro
     build:
       context: .
       dockerfile: build/ws.Dockerfile
