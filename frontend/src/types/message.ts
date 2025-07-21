@@ -12,6 +12,11 @@ type Message = {
   message: string;
 };
 
+type User = {
+  id: string;
+  username: string;
+}
+
 type Friend = {
   friend: string;
 };

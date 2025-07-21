@@ -28,10 +28,11 @@ func init() {
 
 var JwtSecret = []byte(jwtToken)
 
-func GenerateJWT(username string, expiration time.Duration) string {
+func GenerateJWT(user *models.User, expiration time.Duration) string {
 	now := time.Now().UTC()
 	claims := &models.Claims{
-		Username: username,
+		ID:       user.ID,
+		Username: user.Username,
 		Role:     1,
 		Status:   1,
 		RegisteredClaims: jwt.RegisteredClaims{
@@ -45,6 +46,7 @@ func GenerateJWT(username string, expiration time.Duration) string {
 	t, err := token.SignedString(JwtSecret)
 	if err != nil {
 		fmt.Println(err)
+		return ""
 	}
 	return t
 }
@@ -73,8 +75,8 @@ func Auth(next echo.HandlerFunc) echo.HandlerFunc {
 				return echo.NewHTTPError(http.StatusUnauthorized, "User is banned")
 			}
 			// Store the claims in the context for later use
+			c.Set("id", claims.ID)
 			c.Set("username", claims.Username)
-			fmt.Println(claims.Username)
 			c.Set("role", claims.Role)
 			c.Set("status", claims.Status)
 			return next(c)

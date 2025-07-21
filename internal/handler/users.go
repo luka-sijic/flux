@@ -30,15 +30,16 @@ func (h *UserHandler) Login(c echo.Context) error {
 	user := new(models.UserDTO)
 	if err := c.Bind(&user); err != nil {
 		log.Println(err)
+		return c.JSON(http.StatusInternalServerError, "Error binding struct")
 	}
 
 	result := h.svc.LoginUser(user)
-	if !result {
+	if result == nil {
 		return c.JSON(http.StatusInternalServerError, "Incorrect username/password")
 	}
 
-	access := secret.GenerateJWT(user.Username, 900)
-	refresh := secret.GenerateJWT(user.Username, 2592000)
+	access := secret.GenerateJWT(&models.User{ID: result.ID, Username: result.Username}, 900)
+	refresh := secret.GenerateJWT(&models.User{ID: result.ID, Username: result.Username}, 2592000)
 
 	setCookie(c, "access", access, 900)
 	setCookie(c, "refresh", refresh, 2592000)

@@ -9,8 +9,8 @@ import MessageList from "@/components/messageList";
 export default function Home() {
   const router = useRouter();
   // New
-  const { username, loading } = useUser();
-  const { friends, active, setActive } = getFriends(username);
+  const { user, loading } = useUser();
+  const { friends, active, setActive } = getFriends(user?.username);
   const { log, setLog } = getMessages(username, active);
 
   const connection = useRef<WebSocket | null>(null);

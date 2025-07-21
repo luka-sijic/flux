@@ -41,26 +41,25 @@ func (infra *Infra) CreateUser(user *models.UserDTO) bool {
 	return true
 }
 
-func (infra *Infra) LoginUser(user *models.UserDTO) bool {
+func (infra *Infra) LoginUser(user *models.UserDTO) *models.User {
 	idStr, err := infra.RDB.HGet(context.Background(), "user:id_map", user.Username).Result()
 	if err != nil {
-		log.Println(err)
-		return false
+		log.Println("Error 1:", err)
+		return nil
 	}
 	id, err := snowflake.ParseString(idStr)
 	if err != nil {
-		log.Println(err)
-		return false
+		log.Println("Error 2:", err)
+		return nil
 	}
 	db := database.GetShardPool(infra.Pools, id)
 
 	var storedHash string
 	err = db.QueryRow(context.Background(), "SELECT password FROM users WHERE username=$1", user.Username).Scan(&storedHash)
 	if err != nil || !hash.CheckPasswordHash(user.Password, storedHash) {
-		log.Println(err)
-		return false
+		log.Println("Error 3:", err)
+		return nil
 	}
 
-	log.Println(id)
-	return true
+	return &models.User{ID: idStr, Username: user.Username}
 }

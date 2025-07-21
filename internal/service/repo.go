@@ -11,7 +11,7 @@ import (
 
 type Service interface {
 	CreateUser(user *models.UserDTO) bool
-	LoginUser(user *models.UserDTO) bool
+	LoginUser(user *models.UserDTO) *models.User
 
 	AddFriend(username string, user *models.FriendDTO) bool
 	GetFriends(username string) []models.FriendDTO

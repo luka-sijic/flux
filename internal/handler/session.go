@@ -12,22 +12,11 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-func Cookie(c echo.Context) error {
-	cookie := new(http.Cookie)
-	cookie.Name = "username"
-	cookie.Value = "based"
-	cookie.Path = "/"
-	cookie.Expires = time.Now().Add(24 * time.Hour)
-	cookie.Secure = false
-	c.SetCookie(cookie)
-	return c.String(http.StatusOK, "write cookie")
-}
-
 func Me(c echo.Context) error {
 	cookie, err := c.Cookie("access")
 	if err != nil {
 		log.Println("No access cookie:", err)
-		return c.JSON(http.StatusInternalServerError, "cookie not set")
+		return c.JSON(http.StatusUnauthorized, "cookie not set")
 	}
 	raw := cookie.Value
 	log.Println("Raw JWT from cookie:", raw)
@@ -46,7 +35,7 @@ func Me(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusUnauthorized, "Invalid token or wrong type")
 	}
 
-	return c.JSON(http.StatusOK, claims.Username)
+	return c.JSON(http.StatusOK, &models.User{ID: claims.ID, Username: claims.Username})
 }
 
 func Refresh(c echo.Context) error {
@@ -72,7 +61,7 @@ func Refresh(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusUnauthorized, "Invalid token or wrong type")
 	}
 
-	access := secret.GenerateJWT(claims.Username, 900)
+	access := secret.GenerateJWT(&models.User{ID: claims.ID, Username: claims.Username}, 900)
 	setCookie(c, "access", access, 900)
 
 	return c.NoContent(http.StatusOK)

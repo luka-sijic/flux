@@ -1,26 +1,24 @@
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 
 const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API,
   withCredentials: true,
 });
 
-export const fetchUsername = async (): Promise<string | null> => {
+export const fetchUser = async (): Promise<User> => {
   try {
     const res = await api.get('/me');
-    if (res.status === 200) {
-      return res.data;
-    } else {
-      return null;
-    }
+    return res.data;
   } catch (err: any) {
-    if (err.response?.status === 500) {
+    const axiosErr = err as AxiosError; 
+    if (axiosErr.response?.status === 401) {
       const ok = await refreshToken();
       if (ok) {
-        return "true";
+        const { data } = await api.get('/me');
+        return data;
       }
     }
-    return null;
+    throw err;
   }
 };
 

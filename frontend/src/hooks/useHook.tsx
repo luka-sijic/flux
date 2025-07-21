@@ -1,18 +1,17 @@
 import {useState, useEffect} from "react";
-import {fetchFriends, fetchMessages, fetchUsername, getFriendReq} from "../services/service";
+import {fetchFriends, fetchMessages, fetchUser, getFriendReq} from "../services/service";
 
 export default function useUser() {
-    const [username, setUsername] = useState<string | null>('');
+    const [user, setUser] = useState<User>();
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        fetchUsername()
-            .then((u) => setUsername(u))
-            .catch(() => setUsername(null))
+        fetchUser()
+            .then((u) => setUser(u))
             .finally(() => setLoading(false))
     }, []);
 
-    return {username, loading};
+    return {user, loading};
 }
 
 export function getFriends(username: string | null) {

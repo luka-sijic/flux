@@ -1,6 +1,8 @@
 package transport
 
 import (
+	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"time"
@@ -59,11 +61,20 @@ func readPump(h *hub.Hub, c *models.Client) {
 	})
 
 	for {
-		_, msg, err := c.Conn.ReadMessage()
+		_, data, err := c.Conn.ReadMessage()
 		if err != nil {
 			break
 		}
-		h.Broadcast(msg)
+		var msg models.Message
+		if err := json.Unmarshal(data, &msg); err != nil {
+			log.Printf("Invalid JSON sent")
+			continue
+		}
+		switch msg.Type {
+		case "chat":
+			fmt.Println("WORKED")
+			h.Broadcast(data)
+		}
 	}
 }
 

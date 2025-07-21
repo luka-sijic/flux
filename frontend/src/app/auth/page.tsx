@@ -14,7 +14,7 @@ export default function Login() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const res = await axios.post("https://api.basedgroup.com/login", {
+    const res = await axios.post("http://127.0.0.1:8081/login", {
       username,
       password,
     });

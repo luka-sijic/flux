@@ -20,7 +20,6 @@ func UserRoutes(e *echo.Echo, svc *service.Infra) {
 	e.POST("/login", userHandler.Login)
 
 	e.GET("/me", handler.Me)
-	e.GET("/cookie", handler.Cookie)
 	e.GET("/refresh", handler.Refresh)
 }
 

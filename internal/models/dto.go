@@ -5,6 +5,11 @@ type UserDTO struct {
 	Password string `json:"password"`
 }
 
+type User struct {
+	ID       string `json:"id"`
+	Username string `json:"username"`
+}
+
 type FriendDTO struct {
 	Friend string `json:"friend"`
 }
