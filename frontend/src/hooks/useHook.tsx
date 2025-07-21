@@ -14,19 +14,19 @@ export default function useUser() {
     return {user, loading};
 }
 
-export function getFriends(username: string | null) {
+export function getFriends(id: string | null) {
     const [friends, setFriends] = useState<Friend[] | null>([]);
     const [active, setActive] = useState<string | null>(null);
 
     useEffect(() => {
-        if (!username) return;
-        fetchFriends(username)
+        if (!id) return;
+        fetchFriends(id)
             .then((f) => {
                 setFriends(f)
                 if (f && f.length > 0) setActive(f[0].friend);
             })
             .catch(() => setFriends([]))
-    }, [username]);
+    }, [id]);
 
     return {friends, active, setActive};
 }

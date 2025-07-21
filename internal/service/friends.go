@@ -57,18 +57,13 @@ func (infra *Infra) AddFriend(username string, user *models.FriendDTO) bool {
 	return true
 }
 
-func (infra *Infra) GetFriends(username string) []models.FriendDTO {
-	val, err := infra.RDB.HGet(context.Background(), "user:id_map", username).Result()
+func (infra *Infra) GetFriends(userid string) []models.FriendDTO {
+	id, err := snowflake.ParseString(userid)
 	if err != nil {
 		log.Println(err)
 		return nil
 	}
 
-	id, err := snowflake.ParseString(val)
-	if err != nil {
-		log.Println(err)
-		return nil
-	}
 	db := database.GetShardPool(infra.Pools, id)
 	var friends []models.FriendDTO
 	const sql = `
@@ -109,14 +104,8 @@ func (infra *Infra) GetFriends(username string) []models.FriendDTO {
 	return friends
 }
 
-func (infra *Infra) GetRequests(username string) []models.FriendDTO {
-	val, err := infra.RDB.HGet(context.Background(), "user:id_map", username).Result()
-	if err != nil {
-		log.Println(err)
-		return nil
-	}
-
-	id, err := snowflake.ParseString(val)
+func (infra *Infra) GetRequests(userid string) []models.FriendDTO {
+	id, err := snowflake.ParseString(userid)
 	if err != nil {
 		log.Println(err)
 		return nil

@@ -10,8 +10,8 @@ export default function Home() {
   const router = useRouter();
   // New
   const { user, loading } = useUser();
-  const { friends, active, setActive } = getFriends(user?.username);
-  const { log, setLog } = getMessages(username, active);
+  const { friends, active, setActive } = getFriends(user ? user.id : null);
+  const { log, setLog } = getMessages(user ? user.username : null, active);
 
   const connection = useRef<WebSocket | null>(null);
   const [inputValue, setInputValue] = useState<string>("");
@@ -20,7 +20,7 @@ export default function Home() {
   //const [users, setUsers] = useState<Record<string, string>>({});
 
   if (loading) return <p>Loading</p>;
-  if (!username) return <p>Not logged in</p>;
+  if (!user) return <p>Not logged in</p>;
   if (!friends) return <p>No friends</p>;
   if (!log) return <p>No messages</p>;
 
@@ -37,7 +37,7 @@ export default function Home() {
     const content = inputValue.trim();
     if (content.length) if (!content) return;
     connection.current.send(
-      JSON.stringify({ type: "chat", user: username, user2: active, content })
+      JSON.stringify({ type: "chat", user: user.username, user2: active, content })
     );
     setInputValue("");
   };
@@ -82,7 +82,7 @@ export default function Home() {
             type="submit"
             className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
           >
-            {username ? "Send" : "Join"}
+            {user.username ? "Send" : "Join"}
           </button>
         </form>
       </div>

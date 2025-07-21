@@ -29,9 +29,9 @@ func (h *FriendHandler) AddFriend(c echo.Context) error {
 }
 
 func (h *FriendHandler) GetFriends(c echo.Context) error {
-	username := c.Param("id")
+	id := c.Param("id")
 
-	result := h.svc.GetFriends(username)
+	result := h.svc.GetFriends(id)
 	if len(result) == 0 {
 		return c.JSON(http.StatusNotFound, "No friends found")
 	}
@@ -39,9 +39,9 @@ func (h *FriendHandler) GetFriends(c echo.Context) error {
 }
 
 func (h *FriendHandler) GetRequest(c echo.Context) error {
-	username := c.Get("username").(string)
+	id := c.Get("id").(string)
 
-	result := h.svc.GetRequests(username)
+	result := h.svc.GetRequests(id)
 	if len(result) == 0 {
 		return c.JSON(http.StatusOK, "")
 	}

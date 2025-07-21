@@ -8,11 +8,10 @@ import useUser, { getFriendRequests } from "@/hooks/useHook";
 
 export default function Requests() {
   const router = useRouter();
-  const { username } = useUser();
+  const { user } = useUser();
   const { friends, setFriends } = getFriendRequests();
 
-  if (!username) return <p>User not logged in</p>;
-  //if (!friends) return <p>No friend getFriendRequests</p>
+  if (!user) return <p>User not logged in</p>;
 
   const friendResponse = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
