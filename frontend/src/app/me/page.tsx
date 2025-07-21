@@ -14,7 +14,7 @@ export default function Me() {
 
   return (
     <div>
-      <h1>TEST</h1>
+      <h1>TEST2</h1>
       <h2>TEST2</h2>
       Welcome {user?.username} {user?.id}
       <h1>OK</h1>
