@@ -1,0 +1,32 @@
+version: "3.9"
+
+services:
+  http:
+    build:
+      context: .
+      dockerfile: build/http.Dockerfile
+    env_file: .env          # injects all key=value pairs
+    ports:
+      - "8081:8081"
+    restart: unless-stopped
+
+  ws:
+    build:
+      context: .
+      dockerfile: build/ws.Dockerfile
+    env_file: .env
+    ports:
+      - "8085:8085"
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    env_file: .env
+    ports:
+      - "3010:3010"
+    depends_on:
+      - http
+      - ws
+    restart: unless-stopped

@@ -1,0 +1,36 @@
+name: Build & Deploy (prod)
+# Choose when it runs: push to main, or manual button
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on:          # <‑‑ This points to YOUR runner
+      - self-hosted   # mandatory
+      - prod          # the label you gave in ./config.sh --labels
+      - linux         # optional, clarifies OS
+
+    concurrency: prod           # cancel older queued deploys
+    timeout-minutes: 30
+
+    steps:
+      # 1. Get the source
+      - uses: actions/checkout@v4
+
+      # 2. Build images (example: Go backend + React frontend)
+      - name: Build containers
+        run: docker compose -f docker-compose.prod.yml build --pull
+
+      # 3. Run migrations (optional)
+      - name: Apply DB migrations
+        run: docker compose run --rm backend ./migrate up
+
+      # 4. Restart the stack
+      - name: Restart services
+        run: docker compose up -d --force-recreate
+
+      # 5. Quick smoke‑test
+      - name: Curl health‑check
+        run: curl -fsSL http://localhost:8080/health
