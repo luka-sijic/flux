@@ -3,7 +3,6 @@ package service
 import (
 	"context"
 
-	"github.com/luka-sijic/flux/internal/database"
 	"github.com/luka-sijic/flux/internal/models"
 	"github.com/luka-sijic/flux/pkg/hash"
 
@@ -26,7 +25,7 @@ func (infra *Infra) CreateUser(user *models.UserDTO) bool {
 	}
 
 	id := infra.Node.Generate()
-	db := database.GetShardPool(infra.Pools, id)
+	db := infra.GetShardPool(id)
 
 	_, err = db.Exec(context.Background(), "INSERT INTO users (id, username, password) VALUES ($1,$2,$3)", id, user.Username, hashedPassword)
 	if err != nil {
@@ -52,7 +51,7 @@ func (infra *Infra) LoginUser(user *models.UserDTO) *models.User {
 		log.Println("Error 2:", err)
 		return nil
 	}
-	db := database.GetShardPool(infra.Pools, id)
+	db := infra.GetShardPool(id)
 
 	var storedHash string
 	err = db.QueryRow(context.Background(), "SELECT password FROM users WHERE username=$1", user.Username).Scan(&storedHash)

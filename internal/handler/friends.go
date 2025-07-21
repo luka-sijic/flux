@@ -52,10 +52,15 @@ func (h *FriendHandler) GetRequest(c echo.Context) error {
 func (h *FriendHandler) Respond(c echo.Context) error {
 	username := c.Get("username").(string)
 	action := new(models.FriendActionDTO)
+	fmt.Println(username)
 	if err := c.Bind(&action); err != nil {
-		log.Println(err)
+		log.Println("Error?", err)
+		return c.JSON(http.StatusInternalServerError, "error with friend data")
 	}
+	if action.FriendID == "" || action.Action == "" {
+		return c.JSON(http.StatusBadRequest, echo.Map{"error": "missing fields"})
 
+	}
 	result := h.svc.FriendResponse(username, action)
 	if !result {
 		fmt.Println("Error")

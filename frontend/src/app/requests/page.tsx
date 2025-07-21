@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import { useEffect, useState, FormEvent } from "react";
-import axios from "axios";
-import { useRouter } from "next/navigation";
-import { Check, X, Home } from "lucide-react";
-import useUser, { getFriendRequests } from "@/hooks/useHook";
+import { FormEvent } from 'react';
+import axios from 'axios';
+import { useRouter } from 'next/navigation';
+import { Check, X, Home } from 'lucide-react';
+import useUser, { getFriendRequests } from '@/hooks/useHook';
 
 export default function Requests() {
   const router = useRouter();
@@ -15,27 +15,30 @@ export default function Requests() {
 
   const friendResponse = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const action = (e.nativeEvent as SubmitEvent)
+
+    const form = e.currentTarget;
+    const submitter = (e.nativeEvent as SubmitEvent)
       .submitter as HTMLButtonElement;
 
-    // collect the form fields
-    const form = e.currentTarget;
-    const data = new FormData(form);
-    data.set("action", action.value);
+    const formData = new FormData(form);
+
+    const payload = {
+      friendId: formData.get('friendId'),
+      action: submitter.value,
+    };
 
     const response = await axios.post(
-      process.env.NEXT_PUBLIC_API + "/friend/respond",
-      data
+      process.env.NEXT_PUBLIC_API + '/friend/respond',
+      payload,
+      { withCredentials: true }
     );
     if (response.status === 200) {
-      setFriends((prev) =>
-        prev.filter((f) => f.friend !== data.get("friendId"))
-      );
+      setFriends((prev) => prev.filter((f) => f.friend !== payload.friendId));
     }
   };
 
   const handleBack = () => {
-    void router.push("/ws");
+    void router.push('/ws');
   };
 
   return (
@@ -45,10 +48,10 @@ export default function Requests() {
         <h2>Friend Requests</h2>
       </div>
       <div className="bg-gray-700 p-2 m-2 w-64 rounded">
-        {" "}
+        {' '}
         {/* smaller box */}
         <ul className="space-y-1">
-          {" "}
+          {' '}
           {/* tiny gap between rows */}
           {friends.length === 0 ? (
             <p>No pending friend requests</p>

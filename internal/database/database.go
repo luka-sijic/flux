@@ -2,25 +2,28 @@ package database
 
 import (
 	"context"
-	"hash/fnv"
 	"log"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/bwmarrin/snowflake"
+	gocql "github.com/gocql/gocql"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/joho/godotenv"
 	"github.com/redis/go-redis/v9"
 )
 
 type App struct {
-	Pools []*pgxpool.Pool
-	Node  *snowflake.Node
-	RDB   *redis.Client
+	Pools  []*pgxpool.Pool
+	Node   *snowflake.Node
+	RDB    *redis.Client
+	Scylla *gocql.Session
 }
 
 var (
-	RDB *redis.Client
+	RDB    *redis.Client
+	Scylla *gocql.Session
 )
 
 func init() {
@@ -37,8 +40,9 @@ func NewApp() (*App, error) {
 	}
 	pools := ConnectPostgres()
 	rdb := ConnectRedis()
+	session := ConnectScylla()
 
-	return &App{Node: node, Pools: pools, RDB: rdb}, nil
+	return &App{Node: node, Pools: pools, RDB: rdb, Scylla: session}, nil
 }
 
 func ConnectPostgres() []*pgxpool.Pool {
@@ -58,6 +62,18 @@ func ConnectPostgres() []*pgxpool.Pool {
 		pools = append(pools, pool)
 	}
 	return pools
+}
+
+func ConnectScylla() *gocql.Session {
+	cluster := gocql.NewCluster("x32:9042")
+	cluster.Keyspace = "chatapp"
+	cluster.Consistency = gocql.Quorum
+	cluster.Timeout = 10 * time.Second
+	session, err := cluster.CreateSession()
+	if err != nil {
+		log.Fatalf("unable to connect to Scylla: %v", err)
+	}
+	return session
 }
 
 func ConnectRedis() *redis.Client {
@@ -83,26 +99,22 @@ func (a *App) Close() {
 		pool.Close()
 		log.Printf("Shard %d closed\n", i)
 	}
-}
-
-func GetShardPool(pools []*pgxpool.Pool, key snowflake.ID) *pgxpool.Pool {
-	//id := (key >> 12) & ((1 << 10) - 1)
-	//fmt.Println("\033[32m POOL ID: ", id, " \033[0m")
-	h := fnv.New32a()
-	h.Write([]byte(key.String()))
-	idx := int(h.Sum32()) % len(pools)
-	return pools[idx]
-}
-
-func init() {
-	if err := godotenv.Load(".env"); err != nil {
-		log.Fatalln("Error loading .env file", err)
+	if a.RDB != nil {
+		if err := RDB.Close(); err != nil {
+			log.Printf("Error closing redis connection: %v\n", err)
+		}
+	}
+	if a.Scylla != nil {
+		a.Scylla.Close()
 	}
 }
 
+// Websocket Stuff I think
 func Connect() {
 	redisAddr := os.Getenv("REDIS_ADDR")
 	redisPassword := os.Getenv("REDIS_PASS")
+
+	Scylla = ConnectScylla()
 
 	RDB = redis.NewClient(&redis.Options{
 		Addr:     redisAddr,

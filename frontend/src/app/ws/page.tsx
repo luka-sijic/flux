@@ -21,7 +21,7 @@ export default function Home() {
 
   if (loading) return <p>Loading</p>;
   if (!user) return <p>Not logged in</p>;
-  if (!friends) return <p>No friends</p>;
+  //if (!friends) return <p>No friends</p>;
   if (!log) return <p>No messages</p>;
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -46,7 +46,7 @@ export default function Home() {
     <div className="flex h-screen overflow-x-hidden">
       <div className="w-64 border border-gray rounded p-4 bg-black text-white">
         <AddFriendForm />
-        <FriendsList friends={friends} setActive={setActive} />
+        {!friends ? <p>NO FRIENDS</p> : <FriendsList friends={friends} setActive={setActive} />}
       </div>
       {/* Chat Column */}
       <div className="flex flex-col flex-1 p-4 min-h-0">

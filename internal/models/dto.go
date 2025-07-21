@@ -15,6 +15,6 @@ type FriendDTO struct {
 }
 
 type FriendActionDTO struct {
-	FriendID string `json:"friendId"`
-	Action   string `json:"action"`
+	FriendID string `json:"friendId" form:"friendId"`
+	Action   string `json:"action" form:"action"`
 }

@@ -7,7 +7,6 @@ import (
 	"github.com/luka-sijic/flux/internal/database"
 	"github.com/luka-sijic/flux/internal/routes"
 	"github.com/luka-sijic/flux/internal/service"
-	"github.com/luka-sijic/flux/pkg/auto"
 
 	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
@@ -42,8 +41,9 @@ func Start() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	defer app.Close()
 
-	if err := auto.Init(app.Pools); err != nil {
+	if err := app.Init(); err != nil {
 		log.Fatalf("could not create users table: %v", err)
 	}
 

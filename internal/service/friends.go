@@ -4,12 +4,11 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"time"
 
-	"github.com/luka-sijic/flux/internal/database"
 	"github.com/luka-sijic/flux/internal/models"
 
 	"github.com/bwmarrin/snowflake"
-	"github.com/redis/go-redis/v9"
 )
 
 func (infra *Infra) AddFriend(username string, user *models.FriendDTO) bool {
@@ -33,7 +32,7 @@ func (infra *Infra) AddFriend(username string, user *models.FriendDTO) bool {
 		log.Println(err)
 		return false
 	}
-	db := database.GetShardPool(infra.Pools, id)
+	db := infra.GetShardPool(id)
 
 	_, err = db.Exec(context.Background(), "INSERT INTO friends (user_id, status, requester_id) VALUES ($1,$2,$3) ON CONFLICT DO NOTHING", receiver, "pending", id)
 	if err != nil {
@@ -46,7 +45,7 @@ func (infra *Infra) AddFriend(username string, user *models.FriendDTO) bool {
 		log.Println(err)
 		return false
 	}
-	db = database.GetShardPool(infra.Pools, id)
+	db = infra.GetShardPool(id)
 
 	_, err = db.Exec(context.Background(), "INSERT INTO friends (user_id, status, requester_id) VALUES ($1,$2,$3) ON CONFLICT DO NOTHING", receiver, "pending", sender)
 	if err != nil {
@@ -64,7 +63,7 @@ func (infra *Infra) GetFriends(userid string) []models.FriendDTO {
 		return nil
 	}
 
-	db := database.GetShardPool(infra.Pools, id)
+	db := infra.GetShardPool(id)
 	var friends []models.FriendDTO
 	const sql = `
 		SELECT user_id
@@ -110,7 +109,7 @@ func (infra *Infra) GetRequests(userid string) []models.FriendDTO {
 		log.Println(err)
 		return nil
 	}
-	db := database.GetShardPool(infra.Pools, id)
+	db := infra.GetShardPool(id)
 	var friends []models.FriendDTO
 	rows, err := db.Query(context.Background(), "SELECT requester_id FROM friends WHERE user_id=$1 AND status='pending'", id.Int64())
 	if err != nil {
@@ -158,7 +157,7 @@ func (infra *Infra) FriendResponse(username string, action *models.FriendActionD
 		log.Println(err)
 		return false
 	}
-	db := database.GetShardPool(infra.Pools, id)
+	db := infra.GetShardPool(id)
 	_, err = db.Exec(context.Background(), "UPDATE friends SET status=$1 WHERE user_id=$2 AND requester_id=$3", action.Action, receiver, sender)
 	if err != nil {
 		log.Println(err)
@@ -170,24 +169,39 @@ func (infra *Infra) FriendResponse(username string, action *models.FriendActionD
 		log.Println(err)
 		return false
 	}
-	db = database.GetShardPool(infra.Pools, id)
+	db = infra.GetShardPool(id)
 	_, err = db.Exec(context.Background(), "UPDATE friends SET status=$1 WHERE user_id=$2 AND requester_id=$3", action.Action, receiver, sender)
 	if err != nil {
 		log.Println(err)
 		return false
 	}
-	key := fmt.Sprintf("conversation:%s:%s", username, action.FriendID)
 
-	_, err = infra.RDB.XAdd(context.Background(), &redis.XAddArgs{
-		Stream: key,
-		Values: map[string]interface{}{
-			"username": "",
-			"message":  "",
-		},
-	}).Result()
-	if err != nil {
+	conv_id := infra.Node.Generate()
+	//key := fmt.Sprintf("conversation:%s:%s", username, action.FriendID)
+	if err := infra.Scylla.Query(`
+		INSERT INTO conversations (conv_id, kind, title, created_at, owner_id, settings)
+		VALUES (?, ?, ?, ?, ?, ?) IF NOT EXISTS`,
+		conv_id, "DM", "DM", time.Now(), sender, nil).Exec(); err != nil {
 		log.Println(err)
 	}
+	if err := infra.Scylla.Query(`
+		INSERT INTO dm_lookup (user_a, user_b, conv_id)
+		VALUES (?, ?, ?) IF NOT EXISTS`,
+		min(receiver, sender), max(receiver, sender), conv_id).Exec(); err != nil {
+		log.Println(err)
+	}
+
+	/*
+		_, err = infra.RDB.XAdd(context.Background(), &redis.XAddArgs{
+			Stream: key,
+			Values: map[string]interface{}{
+				"username": "",
+				"message":  "",
+			},
+		}).Result()
+		if err != nil {
+			log.Println(err)
+		}*/
 
 	return true
 }

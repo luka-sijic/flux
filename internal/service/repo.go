@@ -1,6 +1,10 @@
 package service
 
 import (
+	"fmt"
+	"hash/fnv"
+
+	"github.com/gocql/gocql"
 	"github.com/luka-sijic/flux/internal/database"
 	"github.com/luka-sijic/flux/internal/models"
 
@@ -21,11 +25,31 @@ type Service interface {
 }
 
 type Infra struct {
-	Pools []*pgxpool.Pool
-	Node  *snowflake.Node
-	RDB   *redis.Client
+	Pools  []*pgxpool.Pool
+	Node   *snowflake.Node
+	RDB    *redis.Client
+	Scylla *gocql.Session
+}
+
+func (infra *Infra) GetShardPool(key snowflake.ID) *pgxpool.Pool {
+	//id := (key >> 12) & ((1 << 10) - 1)
+	//fmt.Println("\033[32m POOL ID: ", id, " \033[0m")
+	h := fnv.New32a()
+	h.Write([]byte(key.String()))
+	idx := int(h.Sum32()) % len(infra.Pools)
+	return infra.Pools[idx]
+}
+
+func sortUsernames(user1, user2 string) string {
+	var key string
+	if user1 > user2 {
+		key = fmt.Sprintf("%s:%s", user1, user2)
+	} else {
+		key = fmt.Sprintf("%s:%s", user2, user1)
+	}
+	return key
 }
 
 func NewService(app *database.App) *Infra {
-	return &Infra{Pools: app.Pools, Node: app.Node, RDB: app.RDB}
+	return &Infra{Pools: app.Pools, Node: app.Node, RDB: app.RDB, Scylla: app.Scylla}
 }

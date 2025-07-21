@@ -73,6 +73,7 @@ func readPump(h *hub.Hub, c *models.Client) {
 		switch msg.Type {
 		case "chat":
 			fmt.Println("WORKED")
+			fmt.Println(msg.Content)
 			h.Broadcast(data)
 		}
 	}
