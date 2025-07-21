@@ -25,6 +25,8 @@ services:
 
   frontend:
     env_file: /home/based/keys/.env.local
+    volumes:
+      - /home/based/keys/.env.local:/app/.env.local:ro
     build:
       context: ./frontend
       dockerfile: Dockerfile
