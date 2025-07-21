@@ -14,6 +14,7 @@ export default function Me() {
 
   return (
     <div>
+      <h1>TEST</h1>
       Welcome {user?.username} {user?.id}
       <h1>OK</h1>
       {messages.map((m, i) => (
