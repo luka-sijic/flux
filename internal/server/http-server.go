@@ -32,7 +32,7 @@ func Start() {
 		AllowCredentials: true,
 	}))
 
-	e.Use(middleware.RateLimiter(middleware.NewRateLimiterMemoryStore(20)))
+	//e.Use(middleware.RateLimiter(middleware.NewRateLimiterMemoryStore(20)))
 
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())

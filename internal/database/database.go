@@ -65,7 +65,7 @@ func ConnectPostgres() []*pgxpool.Pool {
 }
 
 func ConnectScylla() *gocql.Session {
-	cluster := gocql.NewCluster("192.168.1.66:9042")
+	cluster := gocql.NewCluster("x32:9042")
 	cluster.Keyspace = "chatapp"
 	cluster.Consistency = gocql.Quorum
 	cluster.Timeout = 10 * time.Second
