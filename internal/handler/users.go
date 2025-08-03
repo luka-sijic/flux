@@ -46,3 +46,12 @@ func (h *UserHandler) Login(c echo.Context) error {
 
 	return c.NoContent(http.StatusOK)
 }
+
+func (h *UserHandler) Profile(c echo.Context) error {
+	username := c.Param("username")
+	res := h.svc.Profile(username)
+	if res {
+		return c.JSON(http.StatusOK, "1")
+	}
+	return c.JSON(http.StatusOK, "0")
+}

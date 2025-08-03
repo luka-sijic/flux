@@ -62,3 +62,12 @@ func (infra *Infra) LoginUser(user *models.UserDTO) *models.User {
 
 	return &models.User{ID: idStr, Username: user.Username}
 }
+
+func (infra *Infra) Profile(username string) bool {
+	res, err := infra.RDB.Do(context.Background(), "BF.EXISTS", "users", username).Bool()
+	if err != nil || !res {
+		log.Printf("User not found: %v", err)
+		return false
+	}
+	return true
+}

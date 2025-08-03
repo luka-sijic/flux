@@ -36,7 +36,7 @@ func Start() {
 
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
-
+	e.Static("/media", "media")
 	app, err := database.NewApp()
 	if err != nil {
 		log.Fatal(err)

@@ -7,17 +7,22 @@ import (
 )
 
 type Hub struct {
-	clients    map[*models.Client]struct{}
-	broadcast  chan []byte
+	clients    map[string]map[*models.Client]struct{}
+	broadcast  chan deliverReq
 	register   chan *models.Client
 	unregister chan *models.Client
 	mu         sync.RWMutex
 }
 
+type deliverReq struct {
+	user string
+	msg  []byte
+}
+
 func New() *Hub {
 	return &Hub{
-		clients:    make(map[*models.Client]struct{}),
-		broadcast:  make(chan []byte, 256),
+		clients:    make(map[string]map[*models.Client]struct{}),
+		broadcast:  make(chan deliverReq, 1024),
 		register:   make(chan *models.Client),
 		unregister: make(chan *models.Client),
 	}
@@ -35,11 +40,11 @@ func (h *Hub) Unregister(c *models.Client) {
 	}
 	h.unregister <- c
 }
-func (h *Hub) Broadcast(msg []byte) {
-	if len(msg) == 0 {
+func (h *Hub) Broadcast(user string, msg []byte) {
+	if user == "" || len(msg) == 0 {
 		return
 	}
-	h.broadcast <- msg
+	h.broadcast <- deliverReq{user: user, msg: msg}
 }
 
 func (h *Hub) Run() {
@@ -47,12 +52,15 @@ func (h *Hub) Run() {
 		select {
 		case c := <-h.register:
 			h.mu.Lock()
-			h.clients[c] = struct{}{}
+			if h.clients[c.Username] == nil {
+				h.clients[c.Username] = make(map[*models.Client]struct{})
+			}
+			h.clients[c.Username][c] = struct{}{}
 			h.mu.Unlock()
 
 		case c := <-h.unregister:
 			h.mu.Lock()
-			if _, ok := h.clients[c]; ok {
+			if set, ok := h.clients[c.Username]; ok {
 				delete(h.clients, c)
 				close(c.Send)
 			}

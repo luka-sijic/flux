@@ -18,7 +18,7 @@ func UserRoutes(e *echo.Echo, svc *service.Infra) {
 	})
 	e.POST("/register", userHandler.Register)
 	e.POST("/login", userHandler.Login)
-
+	e.GET("/profile/:username", userHandler.Profile)
 	e.GET("/me", handler.Me)
 	e.GET("/refresh", handler.Refresh)
 }

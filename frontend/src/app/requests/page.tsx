@@ -37,7 +37,7 @@ export default function Requests() {
   };
 
   const handleBack = () => {
-    void router.push('/ws');
+    void router.push('/');
   };
 
   return (
