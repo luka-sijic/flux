@@ -5,7 +5,7 @@ Go HTTP server\
 NextJS frontend
 
 # Features
-Paired with go-auth-v2 for user registration and authentication
+Paired with [go-auth-v2 ](https://github.com/luka-sijic/go-auth-v2) for user registration and authentication
 - websocket w/ redis streams impl (kafka and scylladb were my goal but fell short)
 - bloom filters for early auth rejection
 - sharded postgres using snowflake IDs
